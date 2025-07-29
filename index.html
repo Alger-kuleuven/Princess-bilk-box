@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>盲盒纸条小游戏6.0</title>
+    <title>盲盒纸条小游戏7.0</title>
     <style>
         body {
             font-family: '微软雅黑', sans-serif;
@@ -41,35 +41,37 @@
     </style>
 </head>
 <body>
-    <h1>🎁 盲盒纸条小游戏6.0</h1>
+    <h1>🎁 盲盒纸条小游戏7.0</h1>
+    <div id="version" style="color:#888;margin-bottom:18px;"></div>
     <div id="boxes"></div>
     <div id="opened-log">你已打开的盲盒：无</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
     <script>
         const notesVersion = "2025-07.30-08.06";
+        document.getElementById("version").textContent = "纸条版本：" + notesVersion;
         const SEED = "fixed-seed-2025";
         Math.seedrandom(SEED);
 
         const paperNotes = [
-            "今天轮到你当一次“采花”大盗吧，哈哈哈哈",
-            "boom！！！3s内说出对方的五个特质！！！",
-            "用喜羊羊的调唱一句“小鲤鱼，模样真神气，活蹦乱跳，滚了一身泥”互有三次机会，输的人要做一个妩媚的表情，哈哈哈哈哈",
-            "小公主，水果\饮料\零食购物券一张，需当日兑换，过时失效哦！！！",
-            "我不知道怎么去形容对你的喜欢，但就算是吵架伤心难过，也希望你过的平安且喜乐（os：如果吵架伤心难过了，应该也是不喜乐的）",
-            "打卡打卡，今日必须喝完3杯水！！！",
-            "周末自制饮料一杯，兰chef！！！"
+            "动作合影，各自选一个动作拍照，晚上一起看照片，嘿嘿嘿嘿",
+            "恭喜公主，获得小瓜腿部按摩一次！！！",
+            "ktv时间到，指定字或词，歌词接力赛！！！",
+            "心愿挑战赛！！！1，2，3看这边，每人3次机会！！！",
+            "你知道你和星星有什么区别？",
+            "快乐有很多种，但第一种是一见到你就笑",
+            "boom！！！脑筋急转弯时间到，晚上回家得回答我三个脑筋急转弯哦！"
         ];
 
         const quizQuestions = [
-            { q: "一只狼掉进冰水里变成什么？", a: ["槟榔"] },
-            { q: "怎样让珍珠奶茶变大杯？", a: ["念大悲咒"] },
+            { q: "一只狼掉进冰水里变成什么？", a: ["槟榔", "冰狼"] },
+            { q: "怎样让珍珠奶茶变大杯？", a: ["念大悲咒", "念大杯咒"] },
             { q: "麒麟到北极变成什么？", a: ["冰淇淋", "冰麒麟"] },
             { q: "什么布剪不断？", a: ["瀑布"] },
             { q: "9个橙分给13个小朋友，怎么分才公平？", a: ["榨成汁"] },
             { q: "愚公移山唱什么歌词？", a: ["一闪一闪亮晶晶"] },
             { q: "什么官不领工资还要自掏腰包？", a: ["新郎官"] },
-            { q: "铁放外面会生锈，金子呢？", a: ["被偷走"] },
+            { q: "铁放外面会生锈，金子呢？", a: ["被偷走", "偷走"] },
             { q: "一头牛向北走10米，向西走10米，向南走10米，尾巴朝哪？", a: ["朝地"] },
             { q: "什么动物天天熬夜？", a: ["熊猫"] },
             { q: "考试时不能看什么书？", a: ["百科全书"] },
@@ -223,8 +225,9 @@
                 const normalized = normalizeAnswer(userAnswer);
                 const correctList = quiz.a.map(normalizeAnswer);
 
-                if (correctList.includes(normalized)) {
-                    alert("哇哦，公主棒棒棒！答题完成！！！");
+                // 修改为“包含”判断
+                if (correctList.some(ans => normalized.includes(ans))) {
+                    alert("哈哈哈，恭喜你答对了，公主棒棒棒！");
                     openBox(boxElement, boxIndex);
                     userData.opensInHour++;
                     userData.quizAttempts = 0;
@@ -235,9 +238,9 @@
                 } else {
                     userData.quizAttempts++;
                     if (userData.quizAttempts === 1) {
-                        alert("小公主，答错了哦，还有两次机会");
+                        alert("哈哈哈，恭喜你答错了，还有两次机会，再答一次再去百度吧！");
                     } else if (userData.quizAttempts === 2) {
-                        alert("诶呀呀，不会答不出来吧，还剩最后一次机会");
+                        alert("诶呀呀，还是错了，还剩最后一次机会，赶紧百度一下吧！");
                     } else {
                         alert("ono，三次机会已用完请一小时再重试");
                     }
