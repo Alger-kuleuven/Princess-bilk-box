@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>盲盒纸条小游戏7.0</title>
+    <title>盲盒纸条小游戏8.0</title>
     <style>
         body {
             font-family: '微软雅黑', sans-serif;
@@ -38,29 +38,61 @@
             font-size: 16px;
             color: #117a65;
         }
+        #cancel-message {
+            margin-top: 50px;
+            font-size: 18px;
+            color: #a93226;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            background-color: #5dade2;
+            color: white;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h1>🎁 盲盒纸条小游戏7.0</h1>
+    <h1>🎁 盲盒纸条小游戏8.0</h1>
     <div id="version" style="color:#888;margin-bottom:18px;"></div>
     <div id="boxes"></div>
     <div id="opened-log">你已打开的盲盒：无</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
     <script>
-        const notesVersion = "2025-07.30-08.06";
+        const notesVersion = "2025-08.06-08.12";
         document.getElementById("version").textContent = "纸条版本：" + notesVersion;
+
+        let username = localStorage.getItem("blindbox_username");
+        if (!username) {
+            username = prompt("请输入你的名字：");
+
+            if (!username) {
+                document.body.innerHTML = `
+                    <h2>❌ 你未输入名字，游戏已取消。</h2>
+                    <div id="cancel-message">请输入名字才能参与游戏。</div>
+                    <button onclick="location.reload()">重新开始</button>
+                `;
+                throw new Error("用户取消输入名字，终止游戏加载。");
+            }
+
+            localStorage.setItem("blindbox_username", username);
+        }
+
         const SEED = "fixed-seed-2025";
         Math.seedrandom(SEED);
 
         const paperNotes = [
-            "动作合影，各自选一个动作拍照，晚上一起看照片，嘿嘿嘿嘿",
-            "恭喜公主，获得小瓜腿部按摩一次！！！",
-            "ktv时间到，指定字或词，歌词接力赛！！！",
-            "心愿挑战赛！！！1，2，3看这边，每人3次机会！！！",
-            "你知道你和星星有什么区别？",
-            "快乐有很多种，但第一种是一见到你就笑",
-            "boom！！！脑筋急转弯时间到，晚上回家得回答我三个脑筋急转弯哦！"
+            "请问小瓜最喜欢吃什么面？",
+            "闭眼画五角星，只能一笔一笔的画，不能连笔，谁画的最像可获得心愿一个",
+            "真心话时间，互相和对方说能接受和异性朋友单独相处的场所",
+            "数30挑战赛，每个人最多只能数2个连续数字，最少一个，从1开始交替报数，谁先到30谁输，输的人要接受一个小惩罚（赢家设定）",
+            "今天打卡，去喂鸡，浇水种树，浇肥料种果树！！！",
+            "上个礼拜从眼神里读到了思念和爱意，这个礼拜想把这些藏在这句子里❤",
+            "你知道一张椅子用英语怎么说吗？"
         ];
 
         const quizQuestions = [
@@ -76,7 +108,6 @@
             { q: "什么动物天天熬夜？", a: ["熊猫"] },
             { q: "考试时不能看什么书？", a: ["百科全书"] },
             { q: "蚊子的牙齿有多少颗?\nA.20颗 B.22颗 C.24颗 D.26颗", a: ["B"] },
-            { q: "呜呜呃喔呃喔呕呕欧，同一来源的是？\nA.汪汪阿吱阿吱嘻嘻喜\nB.嘎嘎喂唯喂唯硙恺铠\nC.哑哑硙哦噻哦哇哇娃\nD.咔咔啦骂啦骂哒达啦", a: ["A"] },
             { q: "苍蝇吃起来是什么味道？\nA.酸味 B.甜味 C.苦味 D.臭味", a: ["B"] },
             { q: "点燃10支蜡烛，吹灭四支，还剩几支？\nA.10 B.6 C.4 D.0", a: ["C"] },
             { q: "苏格拉底:人类\nA.松树: 植物 B.故宫:建筑 C.《唐诗三百首》:书籍 D.太阳:恒星", a: ["D"] },
@@ -85,12 +116,6 @@
             { q: "“吹牛”吹的是牛的哪个器官？\nA.胃 B.耳朵 C.肺 D.皮肤", a: ["D"] },
             { q: "三寸（）烂之舌？\nA.不 B.溃 C.糜 D.破", a: ["B"] }
         ];
-
-        let username = localStorage.getItem("blindbox_username");
-        if (!username) {
-            username = prompt("请输入你的名字：");
-            localStorage.setItem("blindbox_username", username);
-        }
 
         const versionKey = `blindbox_version_${username}`;
         const userKey = `blindbox_data_${username}`;
@@ -225,7 +250,6 @@
                 const normalized = normalizeAnswer(userAnswer);
                 const correctList = quiz.a.map(normalizeAnswer);
 
-                // 修改为“包含”判断
                 if (correctList.some(ans => normalized.includes(ans))) {
                     alert("哈哈哈，恭喜你答对了，公主棒棒棒！");
                     openBox(boxElement, boxIndex);
