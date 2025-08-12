@@ -217,7 +217,7 @@
             if (userData.openedBoxes.includes(i + 1)) {
                 const noteText = userData.shuffledNotes[i].replace(/[;；]/g, "<br>");
                 box.classList.add("opened");
-                box.innerHTML = `<strong>${flower.emoji} ${flower.name}</strong><div class='note'>📜 ${noteText}</div>`;
+                box.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
             } else {
                 box.innerHTML = `<span class="flower-icon">${flower.emoji}</span>${flower.name}`;
             }
@@ -245,7 +245,7 @@
         function openBox(element, index) {
             const noteText = userData.shuffledNotes[index].replace(/[;；]/g, "<br>");
             element.classList.add("opened");
-            element.innerHTML = `<strong>${flowers[index].emoji} ${flowers[index].name}</strong><div class='note'>📜 ${noteText}</div>`;
+            element.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
             if (!userData.openedBoxes.includes(index + 1)) {
                 userData.openedBoxes.push(index + 1);
             }
@@ -303,4 +303,3 @@
     </script>
 </body>
 </html>
-
