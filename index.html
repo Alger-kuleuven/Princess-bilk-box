@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>盲盒纸条小游戏8.0</title>
+    <title>盲盒纸条小游戏9.0</title>
     <style>
         body {
             font-family: '微软雅黑', sans-serif;
@@ -11,22 +11,34 @@
         }
         .box {
             display: inline-block;
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             margin: 10px;
-            background: #f8c471;
-            line-height: 100px;
-            border-radius: 10px;
-            font-size: 20px;
+            border-radius: 12px;
+            font-size: 18px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
+            box-shadow: 2px 4px 8px rgba(0,0,0,0.15);
+            padding: 8px;
+            color: white;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+        .box:hover {
+            transform: scale(1.05);
         }
         .opened {
-            background: #aed6f1;
+            background: #aed6f1 !important;
             cursor: default;
             height: auto;
             padding: 10px;
             line-height: normal;
+            color: #2e86c1;
+        }
+        .flower-icon {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 6px;
         }
         .note {
             margin-top: 8px;
@@ -56,7 +68,7 @@
     </style>
 </head>
 <body>
-    <h1>🎁 盲盒纸条小游戏8.0</h1>
+    <h1>🎁 盲盒纸条小游戏9.0</h1>
     <div id="version" style="color:#888;margin-bottom:18px;"></div>
     <div id="boxes"></div>
     <div id="opened-log">你已打开的盲盒：无</div>
@@ -86,18 +98,17 @@
         Math.seedrandom(SEED);
 
         const paperNotes = [
-            "请问小瓜最喜欢吃什么面？",
-            "闭眼画五角星，只能一笔一笔的画，不能连笔，谁画的最像可获得心愿一个",
+            "叮叮叮，第二天互相指定穿搭要素",
+            "你听过蚂蚁...笑吗？你觉得它有几种笑声？",
             "真心话时间，互相和对方说能接受和异性朋友单独相处的场所",
-            "数30挑战赛，每个人最多只能数2个连续数字，最少一个，从1开始交替报数，谁先到30谁输，输的人要接受一个小惩罚（赢家设定）",
-            "今天打卡，去喂鸡，浇水种树，浇肥料种果树！！！",
-            "上个礼拜从眼神里读到了思念和爱意，这个礼拜想把这些藏在这句子里❤",
-            "你知道一张椅子用英语怎么说吗？"
+            "心愿挑战赛，错误惩罚表，十位数要对，个位数要错，各三次机会，数量多的人获得心愿一个！！！",
+            "要不今天你给我讲个冷笑话吧哈哈哈哈哈哈",
+            "断句挑战赛，《货拉拉拉不拉拉布拉多拉布拉多拉的多货拉拉就不拉拉布拉多拉的不多货拉拉就拉拉布拉多》",
+            "我今天拍了一朵小花；很好看；想给发给你看；你会不会觉得我很无趣呀"
         ];
 
         const quizQuestions = [
             { q: "一只狼掉进冰水里变成什么？", a: ["槟榔", "冰狼"] },
-            { q: "怎样让珍珠奶茶变大杯？", a: ["念大悲咒", "念大杯咒"] },
             { q: "麒麟到北极变成什么？", a: ["冰淇淋", "冰麒麟"] },
             { q: "什么布剪不断？", a: ["瀑布"] },
             { q: "9个橙分给13个小朋友，怎么分才公平？", a: ["榨成汁"] },
@@ -115,6 +126,16 @@
             { q: "小明被困在一个无人、无食物来源但有淡水的荒岛上，若只能带一种等重食物？\nA.葡萄 B.馒头 C.酸奶 D.花生仁", a: ["D"] },
             { q: "“吹牛”吹的是牛的哪个器官？\nA.胃 B.耳朵 C.肺 D.皮肤", a: ["D"] },
             { q: "三寸（）烂之舌？\nA.不 B.溃 C.糜 D.破", a: ["B"] }
+        ];
+
+        const flowers = [
+            { name: "玫瑰", emoji: "🌹", color: "#e74c3c" },
+            { name: "百合", emoji: "🌸", color: "#f1948a" },
+            { name: "向日葵", emoji: "🌻", color: "#f1c40f" },
+            { name: "郁金香", emoji: "🌷", color: "#d35400" },
+            { name: "兰花", emoji: "💐", color: "#8e44ad" },
+            { name: "牡丹", emoji: "🌺", color: "#c0392b" },
+            { name: "薰衣草", emoji: "💮", color: "#9b59b6" }
         ];
 
         const versionKey = `blindbox_version_${username}`;
@@ -187,14 +208,18 @@
         const openedLogDiv = document.getElementById("opened-log");
 
         for (let i = 0; i < 7; i++) {
+            const flower = flowers[i];
             const box = document.createElement("div");
             box.className = "box";
-            box.textContent = `盲盒 ${i + 1}`;
+            box.style.backgroundColor = flower.color;
             box.dataset.index = i;
 
             if (userData.openedBoxes.includes(i + 1)) {
+                const noteText = userData.shuffledNotes[i].replace(/[;；]/g, "<br>");
                 box.classList.add("opened");
-                box.innerHTML = `<strong>盲盒 ${i + 1}</strong><div class='note'>📜 ${userData.shuffledNotes[i]}</div>`;
+                box.innerHTML = `<strong>${flower.emoji} ${flower.name}</strong><div class='note'>📜 ${noteText}</div>`;
+            } else {
+                box.innerHTML = `<span class="flower-icon">${flower.emoji}</span>${flower.name}`;
             }
 
             box.addEventListener("click", function () {
@@ -218,8 +243,9 @@
         }
 
         function openBox(element, index) {
+            const noteText = userData.shuffledNotes[index].replace(/[;；]/g, "<br>");
             element.classList.add("opened");
-            element.innerHTML = `<strong>盲盒 ${index + 1}</strong><div class='note'>📜 ${userData.shuffledNotes[index]}</div>`;
+            element.innerHTML = `<strong>${flowers[index].emoji} ${flowers[index].name}</strong><div class='note'>📜 ${noteText}</div>`;
             if (!userData.openedBoxes.includes(index + 1)) {
                 userData.openedBoxes.push(index + 1);
             }
