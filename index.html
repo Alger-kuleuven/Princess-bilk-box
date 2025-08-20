@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>盲盒纸条小游戏9.0</title>
+    <title>盲盒纸条小游戏10.0</title>
     <style>
         body {
             font-family: '微软雅黑', sans-serif;
@@ -68,14 +68,14 @@
     </style>
 </head>
 <body>
-    <h1>🎁 盲盒纸条小游戏9.0</h1>
+    <h1>🎁 盲盒纸条小游戏10.0</h1>
     <div id="version" style="color:#888;margin-bottom:18px;"></div>
     <div id="boxes"></div>
     <div id="opened-log">你已打开的盲盒：无</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
     <script>
-        const notesVersion = "2025-08.13-08.19";
+        const notesVersion = "2025-08.20-08.26";
         document.getElementById("version").textContent = "纸条版本：" + notesVersion;
 
         let username = localStorage.getItem("blindbox_username");
@@ -98,19 +98,17 @@
         Math.seedrandom(SEED);
 
         const paperNotes = [
-            "叮叮叮，第二天互相指定穿搭要素",
-            "你听过蚂蚁...笑吗？你觉得它有几种笑声？",
-            "Boom!!!，罚你等我回来亲腹肌，有多少块亲多少口！！！",
-            "心愿挑战赛，错误惩罚表，十位数要对，个位数要错，各三次机会，数量多的人获得心愿一个！！！",
-            "要不今天你给我讲个冷笑话吧哈哈哈哈哈哈",
-            "断句挑战赛，《货拉拉拉不拉拉布拉多拉布拉多拉的多货拉拉就不拉拉布拉多拉的不多货拉拉就拉拉布拉多》",
-            "我今天拍了一朵小花；很好看；想给发给你看；你会不会觉得我很无趣呀"
+            "要不今天去买个双色球吧，哈哈哈哈哈",
+            "麻烦把手头的事情放一放，该来敷衍我了！！！",
+            "有人掉进陷阱里，死的人叫死人，活的人叫什么？",
+            "身体局部照片各一张，让对方猜是什么部位",
+            "小公主今天教你一招公共场所放P妙招，“放P的时候一定要说什么烧焦了，这样周围的人就会把你的P吸光”",
+            "断句挑战赛2.0，《校服上除了校徽别别别的让你别别别的别别别的你们非别别的》",
+            "boom！！！挑个喜欢的衣服或者裙子吧，我买单！！！"
         ];
 
         const quizQuestions = [
             { q: "一只狼掉进冰水里变成什么？", a: ["槟榔", "冰狼"] },
-            { q: "麒麟到北极变成什么？", a: ["冰淇淋", "冰麒麟"] },
-            { q: "什么布剪不断？", a: ["瀑布"] },
             { q: "9个橙分给13个小朋友，怎么分才公平？", a: ["榨汁"] },
             { q: "愚公移山唱什么歌词？", a: ["一闪一闪亮晶晶"] },
             { q: "什么官不领工资还要自掏腰包？", a: ["新郎官"] },
@@ -119,7 +117,6 @@
             { q: "什么动物天天熬夜？", a: ["熊猫"] },
             { q: "考试时不能看什么书？", a: ["百科全书"] },
             { q: "蚊子的牙齿有多少颗?\nA.20颗 B.22颗 C.24颗 D.26颗", a: ["B"] },
-            { q: "苍蝇吃起来是什么味道？\nA.酸味 B.甜味 C.苦味 D.臭味", a: ["B"] },
             { q: "点燃10支蜡烛，吹灭四支，还剩几支？\nA.10 B.6 C.4 D.0", a: ["C"] },
             { q: "苏格拉底:人类\nA.松树: 植物 B.故宫:建筑 C.《唐诗三百首》:书籍 D.太阳:恒星", a: ["D"] },
             { q: "我国结婚证内印的是什么花？\nA.百合 B.牡丹 C.杜鹃 D.玫瑰", a: ["B"] },
@@ -128,14 +125,15 @@
             { q: "三寸（）烂之舌？\nA.不 B.溃 C.糜 D.破", a: ["B"] }
         ];
 
+        // 更新花朵为不同的 7 种
         const flowers = [
-            { name: "玫瑰", emoji: "🌹", color: "#e74c3c" },
-            { name: "百合", emoji: "🌸", color: "#f1948a" },
-            { name: "向日葵", emoji: "🌻", color: "#f1c40f" },
-            { name: "郁金香", emoji: "🌷", color: "#d35400" },
-            { name: "兰花", emoji: "💐", color: "#8e44ad" },
-            { name: "牡丹", emoji: "🌺", color: "#c0392b" },
-            { name: "薰衣草", emoji: "💮", color: "#9b59b6" }
+            { name: "梅花", emoji: "❄️", color: "#e67e22" },
+            { name: "菊花", emoji: "🌼", color: "#f4d03f" },
+            { name: "樱花", emoji: "🌸", color: "#f1948a" },
+            { name: "康乃馨", emoji: "🥀", color: "#c0392b" },
+            { name: "马蹄莲", emoji: "⚜️", color: "#8e44ad" },
+            { name: "杜鹃花", emoji: "🌺", color: "#e84393" },
+            { name: "紫罗兰", emoji: "💜", color: "#6c3483" }
         ];
 
         const versionKey = `blindbox_version_${username}`;
@@ -215,7 +213,7 @@
             box.dataset.index = i;
 
             if (userData.openedBoxes.includes(i + 1)) {
-                const noteText = userData.shuffledNotes[i].replace(/[;；]/g, "<br>");
+                const noteText = userData.shuffledNotes[i];
                 box.classList.add("opened");
                 box.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
             } else {
@@ -243,7 +241,7 @@
         }
 
         function openBox(element, index) {
-            const noteText = userData.shuffledNotes[index].replace(/[;；]/g, "<br>");
+            const noteText = userData.shuffledNotes[index];
             element.classList.add("opened");
             element.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
             if (!userData.openedBoxes.includes(index + 1)) {
@@ -303,6 +301,3 @@
     </script>
 </body>
 </html>
-
-
-
