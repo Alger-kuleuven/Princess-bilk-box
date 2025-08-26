@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>盲盒纸条小游戏10.0</title>
+    <title>盲盒纸条小游戏11.0</title>
     <style>
         body {
             font-family: '微软雅黑', sans-serif;
@@ -23,6 +23,8 @@
             color: white;
             font-weight: bold;
             line-height: 1.4;
+            position: relative;
+            overflow: hidden;
         }
         .box:hover {
             transform: scale(1.05);
@@ -65,17 +67,56 @@
             color: white;
             cursor: pointer;
         }
+
+        /* 花朵爆炸动画 */
+        @keyframes burst {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+        .flower-burst {
+            animation: burst 0.8s ease-out forwards;
+        }
+
+        /* 粒子烟花效果 */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+        @keyframes particle-move {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) scale(0.2);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>🎁 盲盒纸条小游戏10.0</h1>
+    <h1>🎁 盲盒纸条小游戏11.0</h1>
     <div id="version" style="color:#888;margin-bottom:18px;"></div>
     <div id="boxes"></div>
     <div id="opened-log">你已打开的盲盒：无</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
     <script>
-        const notesVersion = "2025-08.20-08.26";
+        const notesVersion = "2025-08.27-09.02";
         document.getElementById("version").textContent = "纸条版本：" + notesVersion;
 
         let username = localStorage.getItem("blindbox_username");
@@ -98,20 +139,16 @@
         Math.seedrandom(SEED);
 
         const paperNotes = [
-            "要不今天去买个双色球吧，哈哈哈哈哈",
-            "麻烦把手头的事情放一放，该来敷衍我了！！！",
-            "有人掉进陷阱里，死的人叫死人，活的人叫什么？",
-            "身体局部照片各一张，让对方猜是什么部位",
-            "小公主今天教你一招公共场所放P妙招，“放P的时候一定要说什么烧焦了，这样周围的人就会把你的P吸光”",
-            "断句挑战赛2.0，《校服上除了校徽别别别的让你别别别的别别别的你们非别别的》",
-            "来一把紧张又刺激的成语接龙吧！！！"
+            "猜泰国广告，哈哈哈哈哈哈",
+            "Boom!!!请问下面哪个是正确的Logo",
+            "金鸡独立15s，成功即可指定我做任意事情（时限15s）",
+            "爱情公寓考题三道，哈哈哈哈给",
+            "想知道螃蟹和虾比赛跑步，谁会赢吗？",
+            "给卷卷和发财浇个水吧",
+            "明日摸鱼任务，请找出最优路线，hhhhhhhh"
         ];
 
         const quizQuestions = [
-            { q: "一只狼掉进冰水里变成什么？", a: ["槟榔", "冰狼"] },
-            { q: "9个橙分给13个小朋友，怎么分才公平？", a: ["榨汁"] },
-            { q: "愚公移山唱什么歌词？", a: ["一闪一闪亮晶晶"] },
-            { q: "什么官不领工资还要自掏腰包？", a: ["新郎官"] },
             { q: "铁放外面会生锈，金子呢？", a: ["被偷走", "偷走"] },
             { q: "一头牛向北走10米，向西走10米，向南走10米，尾巴朝哪？", a: ["朝地"] },
             { q: "什么动物天天熬夜？", a: ["熊猫"] },
@@ -125,15 +162,15 @@
             { q: "三寸（）烂之舌？\nA.不 B.溃 C.糜 D.破", a: ["B"] }
         ];
 
-        // 更新花朵为不同的 7 种
+        // 7 种新花
         const flowers = [
-            { name: "雪花", emoji: "❄️", color: "#e67e22" },
-            { name: "菊花", emoji: "🌼", color: "#f4d03f" },
-            { name: "樱花", emoji: "🌸", color: "#f1948a" },
-            { name: "康乃馨", emoji: "🥀", color: "#c0392b" },
-            { name: "马蹄莲", emoji: "⚜️", color: "#8e44ad" },
-            { name: "杜鹃花", emoji: "🌺", color: "#e84393" },
-            { name: "紫罗兰", emoji: "💜", color: "#6c3483" }
+            { name: "向日葵", emoji: "🌻", color: "#f1c40f" },
+            { name: "玫瑰", emoji: "🌹", color: "#e74c3c" },
+            { name: "百合", emoji: "🤍", color: "#f8f9f9" },
+            { name: "风信子", emoji: "🪻", color: "#9b59b6" },
+            { name: "铃兰", emoji: "🌷", color: "#2ecc71" },
+            { name: "月季", emoji: "🌺", color: "#ff6f61" },
+            { name: "牡丹", emoji: "🥀", color: "#c0392b" }
         ];
 
         const versionKey = `blindbox_version_${username}`;
@@ -240,14 +277,54 @@
             boxesDiv.appendChild(box);
         }
 
+        function createParticles(container) {
+            const colors = ["#f39c12", "#e74c3c", "#9b59b6", "#2ecc71", "#3498db", "#f1c40f"];
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement("div");
+                p.className = "particle";
+                const angle = Math.random() * 2 * Math.PI;
+                const distance = 50 + Math.random() * 50;
+                const x = Math.cos(angle) * distance + "px";
+                const y = Math.sin(angle) * distance + "px";
+                p.style.setProperty("--x", x);
+                p.style.setProperty("--y", y);
+                p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                p.style.left = "50%";
+                p.style.top = "50%";
+                p.style.transform = "translate(-50%, -50%)";
+                p.style.animation = "particle-move 0.8s ease-out forwards";
+                container.appendChild(p);
+                p.addEventListener("animationend", () => p.remove());
+            }
+        }
+
         function openBox(element, index) {
             const noteText = userData.shuffledNotes[index];
-            element.classList.add("opened");
-            element.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
-            if (!userData.openedBoxes.includes(index + 1)) {
-                userData.openedBoxes.push(index + 1);
+            const flowerIcon = element.querySelector(".flower-icon");
+
+            if (flowerIcon) {
+                flowerIcon.classList.add("flower-burst");
+
+                // 同时触发粒子烟花
+                createParticles(element);
+
+                // 动画结束后显示纸条
+                flowerIcon.addEventListener("animationend", () => {
+                    element.classList.add("opened");
+                    element.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
+                    if (!userData.openedBoxes.includes(index + 1)) {
+                        userData.openedBoxes.push(index + 1);
+                    }
+                    updateOpenedLog();
+                }, { once: true });
+            } else {
+                element.classList.add("opened");
+                element.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
+                if (!userData.openedBoxes.includes(index + 1)) {
+                    userData.openedBoxes.push(index + 1);
+                }
+                updateOpenedLog();
             }
-            updateOpenedLog();
         }
 
         function updateOpenedLog() {
@@ -301,5 +378,3 @@
     </script>
 </body>
 </html>
-
-
