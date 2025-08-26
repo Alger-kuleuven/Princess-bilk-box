@@ -70,41 +70,24 @@
 
         /* 花朵爆炸动画 */
         @keyframes burst {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(2);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0);
-                opacity: 0;
-            }
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(2); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
         }
         .flower-burst {
             animation: burst 0.8s ease-out forwards;
         }
 
-        /* 粒子烟花效果 */
+        /* 粒子动画 */
         .particle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
+            position: fixed;
             border-radius: 50%;
-            opacity: 0;
             pointer-events: none;
         }
         @keyframes particle-move {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--x), var(--y)) scale(0.2);
-                opacity: 0;
-            }
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            70% { opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0.3); opacity: 0; }
         }
     </style>
 </head>
@@ -122,7 +105,6 @@
         let username = localStorage.getItem("blindbox_username");
         if (!username) {
             username = prompt("请输入你的名字：");
-
             if (!username) {
                 document.body.innerHTML = `
                     <h2>❌ 你未输入名字，游戏已取消。</h2>
@@ -131,7 +113,6 @@
                 `;
                 throw new Error("用户取消输入名字，终止游戏加载。");
             }
-
             localStorage.setItem("blindbox_username", username);
         }
 
@@ -162,15 +143,15 @@
             { q: "三寸（）烂之舌？\nA.不 B.溃 C.糜 D.破", a: ["B"] }
         ];
 
-        // 7 种新花
+        // 不同花朵 & 对应色系
         const flowers = [
-            { name: "向日葵", emoji: "🌻", color: "#f1c40f" },
-            { name: "玫瑰", emoji: "🌹", color: "#e74c3c" },
-            { name: "百合", emoji: "🤍", color: "#f8f9f9" },
-            { name: "风信子", emoji: "🪻", color: "#9b59b6" },
-            { name: "铃兰", emoji: "🌷", color: "#2ecc71" },
-            { name: "月季", emoji: "🌺", color: "#ff6f61" },
-            { name: "牡丹", emoji: "🥀", color: "#c0392b" }
+            { name: "向日葵", emoji: "🌻", color: "#f1c40f", colors: ["#f39c12","#f1c40f","#e67e22"] },
+            { name: "玫瑰", emoji: "🌹", color: "#e74c3c", colors: ["#e74c3c","#c0392b","#ff7675"] },
+            { name: "百合", emoji: "🤍", color: "#f8f9f9", colors: ["#ecf0f1","#bdc3c7","#95a5a6"] },
+            { name: "风信子", emoji: "🪻", color: "#9b59b6", colors: ["#9b59b6","#8e44ad","#be90d4"] },
+            { name: "铃兰", emoji: "🌷", color: "#2ecc71", colors: ["#27ae60","#2ecc71","#58d68d"] },
+            { name: "月季", emoji: "🌺", color: "#ff6f61", colors: ["#ff6f61","#e74c3c","#ff9999"] },
+            { name: "牡丹", emoji: "🥀", color: "#c0392b", colors: ["#c0392b","#922b21","#e59866"] }
         ];
 
         const versionKey = `blindbox_version_${username}`;
@@ -184,19 +165,16 @@
 
         function loadUserData() {
             const data = localStorage.getItem(userKey);
-            if (data) {
-                return JSON.parse(data);
-            } else {
-                return {
-                    openedBoxes: [],
-                    opensInHour: 0,
-                    quizAttempts: 0,
-                    correctQuestions: [],
-                    firstOpenTime: null,
-                    currentQuizIndex: null,
-                    shuffledNotes: [...paperNotes].sort(() => Math.random() - 0.5)
-                };
-            }
+            if (data) return JSON.parse(data);
+            return {
+                openedBoxes: [],
+                opensInHour: 0,
+                quizAttempts: 0,
+                correctQuestions: [],
+                firstOpenTime: null,
+                currentQuizIndex: null,
+                shuffledNotes: [...paperNotes].sort(() => Math.random() - 0.5)
+            };
         }
 
         function saveUserData() {
@@ -208,15 +186,13 @@
         }
 
         function getNewQuestionIndex() {
-            const remaining = quizQuestions
-                .map((_, i) => i)
-                .filter(i => !userData.correctQuestions.includes(i));
+            const remaining = quizQuestions.map((_, i) => i).filter(i => !userData.correctQuestions.includes(i));
             if (remaining.length === 0) return null;
             return remaining[Math.floor(Math.random() * remaining.length)];
         }
 
         function getOrSetCurrentQuestionIndex() {
-            if (userData.currentQuizIndex === null || userData.currentQuizIndex === undefined) {
+            if (userData.currentQuizIndex == null) {
                 const idx = getNewQuestionIndex();
                 userData.currentQuizIndex = idx;
                 saveUserData();
@@ -260,9 +236,7 @@
             box.addEventListener("click", function () {
                 const idx = parseInt(this.dataset.index);
                 if (this.classList.contains("opened")) return;
-
                 resetHourIfNeeded();
-
                 if (userData.opensInHour === 0) {
                     openBox(this, idx);
                     userData.opensInHour++;
@@ -273,29 +247,43 @@
                     alert("开盲盒次数已满，请稍后再试~");
                 }
             });
-
             boxesDiv.appendChild(box);
         }
 
-        function createParticles(container) {
-            const colors = ["#f39c12", "#e74c3c", "#9b59b6", "#2ecc71", "#3498db", "#f1c40f"];
-            for (let i = 0; i < 15; i++) {
-                const p = document.createElement("div");
-                p.className = "particle";
-                const angle = Math.random() * 2 * Math.PI;
-                const distance = 50 + Math.random() * 50;
-                const x = Math.cos(angle) * distance + "px";
-                const y = Math.sin(angle) * distance + "px";
-                p.style.setProperty("--x", x);
-                p.style.setProperty("--y", y);
-                p.style.background = colors[Math.floor(Math.random() * colors.length)];
-                p.style.left = "50%";
-                p.style.top = "50%";
-                p.style.transform = "translate(-50%, -50%)";
-                p.style.animation = "particle-move 0.8s ease-out forwards";
-                container.appendChild(p);
-                p.addEventListener("animationend", () => p.remove());
-            }
+        // 🎆 粒子烟花（分层 + 色系）
+        function createParticles(originElement, flowerColors) {
+            const rect = originElement.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+
+            const layers = [
+                { count: 25, size: [6, 10], speed: 1.2 },
+                { count: 40, size: [3, 6], speed: 1.8 }
+            ];
+
+            layers.forEach(layer => {
+                for (let i = 0; i < layer.count; i++) {
+                    const p = document.createElement("div");
+                    p.className = "particle";
+                    p.style.left = originX + "px";
+                    p.style.top = originY + "px";
+
+                    const angle = Math.random() * 2 * Math.PI;
+                    const distance = 150 + Math.random() * 300;
+                    const x = Math.cos(angle) * distance + "px";
+                    const y = Math.sin(angle) * distance + "px";
+                    p.style.setProperty("--x", x);
+                    p.style.setProperty("--y", y);
+
+                    const size = layer.size[0] + Math.random() * (layer.size[1] - layer.size[0]);
+                    p.style.width = p.style.height = size + "px";
+                    p.style.background = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+                    p.style.animation = `particle-move ${layer.speed}s ease-out forwards`;
+
+                    document.body.appendChild(p);
+                    p.addEventListener("animationend", () => p.remove());
+                }
+            });
         }
 
         function openBox(element, index) {
@@ -304,35 +292,24 @@
 
             if (flowerIcon) {
                 flowerIcon.classList.add("flower-burst");
-
-                // 同时触发粒子烟花
-                createParticles(element);
-
-                // 动画结束后显示纸条
+                createParticles(element, flowers[index].colors);
                 flowerIcon.addEventListener("animationend", () => {
                     element.classList.add("opened");
                     element.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
-                    if (!userData.openedBoxes.includes(index + 1)) {
-                        userData.openedBoxes.push(index + 1);
-                    }
+                    if (!userData.openedBoxes.includes(index + 1)) userData.openedBoxes.push(index + 1);
                     updateOpenedLog();
                 }, { once: true });
             } else {
                 element.classList.add("opened");
                 element.innerHTML = `<div class='note'>📜 ${noteText}</div>`;
-                if (!userData.openedBoxes.includes(index + 1)) {
-                    userData.openedBoxes.push(index + 1);
-                }
+                if (!userData.openedBoxes.includes(index + 1)) userData.openedBoxes.push(index + 1);
                 updateOpenedLog();
             }
         }
 
         function updateOpenedLog() {
-            if (userData.openedBoxes.length === 0) {
-                openedLogDiv.textContent = "你已打开的盲盒：无";
-            } else {
-                openedLogDiv.textContent = `你已打开的盲盒：${userData.openedBoxes.join(", ")}`;
-            }
+            openedLogDiv.textContent = userData.openedBoxes.length === 0 ?
+                "你已打开的盲盒：无" : `你已打开的盲盒：${userData.openedBoxes.join(", ")}`;
         }
 
         function onQuestionTrigger(boxElement, boxIndex) {
@@ -341,16 +318,12 @@
                 alert("你已经答完所有题啦！太棒啦 🎉");
                 return;
             }
-
             const quiz = quizQuestions[qIndex];
-
             while (userData.quizAttempts < 3) {
                 const userAnswer = prompt(`答题时间到！请回答：\n\n${quiz.q}`);
                 if (!userAnswer) return;
-
                 const normalized = normalizeAnswer(userAnswer);
                 const correctList = quiz.a.map(normalizeAnswer);
-
                 if (correctList.some(ans => normalized.includes(ans))) {
                     alert("哈哈哈，恭喜你答对了，公主棒棒棒！");
                     openBox(boxElement, boxIndex);
